@@ -4,23 +4,40 @@ import random
 from fpdf import FPDF
 import streamlit as st
 
-# --- PAGE CONFIGURATION & HIGH-CONTRAST CSS ---
+# --- PAGE CONFIGURATION & ROBUST HIGH-CONTRAST CSS ---
 st.set_page_config(
     page_title="🌟 Fun 5th Grade Fraction Adventure! 🍕", layout="wide"
 )
 
 st.markdown("""
     <style>
-    /* Main Background & Font Styling */
+    /* Main App Background & Default Text */
     .stApp {
         background: #F0F4F8;
         font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+        color: #1A365D;
     }
     
-    /* High-Contrast Fun Headers */
+    /* Force Sidebar Background & Text Contrast */
+    [data-testid="stSidebar"] {
+        background-color: #FFFDF0;
+        border-right: 3px solid #FFD166;
+    }
+    [data-testid="stSidebar"] h2, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
+        color: #1A365D !important;
+        font-weight: bold;
+    }
+    
+    /* High-Contrast Main Headers */
     h1, h2, h3 {
         color: #1A365D !important;
         font-weight: 900;
+    }
+    
+    /* Standard Markdown Text */
+    p, span, label, .stMarkdown {
+        color: #1A365D !important;
+        font-size: 16px;
     }
     
     /* Custom Card Containers for High Readability */
@@ -36,7 +53,7 @@ st.markdown("""
     /* Playful Buttons Styling */
     .stButton>button {
         background-color: #FF6B6B;
-        color: white;
+        color: white !important;
         font-size: 18px;
         font-weight: bold;
         border-radius: 15px;
@@ -247,9 +264,7 @@ mode = st.sidebar.radio(
 # ==========================================
 if mode == "1. 🍕 Pizza & Bar Explorer":
   st.markdown("<h1>🍕 Pizza & Fraction Bar Explorer</h1>", unsafe_allow_html=True)
-  st.markdown(
-      "<div class='fun-card'>", unsafe_allow_html=True
-  )  # Wrap in card for high contrast
+  st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
       "Welcome to the fraction diner! Slide the controls to cut delicious"
       " pizzas and bars into equal slices."
