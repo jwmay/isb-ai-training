@@ -4,7 +4,7 @@ import random
 from fpdf import FPDF
 import streamlit as st
 
-# --- PAGE CONFIGURATION & KID-FRIENDLY CSS ---
+# --- PAGE CONFIGURATION & HIGH-CONTRAST CSS ---
 st.set_page_config(
     page_title="🌟 Fun 5th Grade Fraction Adventure! 🍕", layout="wide"
 )
@@ -13,42 +13,41 @@ st.markdown("""
     <style>
     /* Main Background & Font Styling */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: #F0F4F8;
         font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
     }
     
-    /* Fun Headers */
+    /* High-Contrast Fun Headers */
     h1, h2, h3 {
-        color: #ff6b6b;
-        font-weight: 800;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        color: #1A365D !important;
+        font-weight: 900;
     }
     
-    /* Custom Card Containers */
+    /* Custom Card Containers for High Readability */
     .fun-card {
-        background-color: white;
-        padding: 20px;
+        background-color: #FFFFFF;
+        padding: 25px;
         border-radius: 20px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
         margin-bottom: 20px;
-        border: 3px solid #ffde59;
+        border: 3px solid #FFD166;
     }
     
     /* Playful Buttons Styling */
     .stButton>button {
-        background-color: #ff6b6b;
+        background-color: #FF6B6B;
         color: white;
         font-size: 18px;
         font-weight: bold;
         border-radius: 15px;
         padding: 10px 24px;
         border: none;
-        box-shadow: 0 4px #d9534f;
+        box-shadow: 0 4px #D9534F;
         transition: all 0.2s ease;
     }
     .stButton>button:hover {
-        background-color: #ff5252;
-        box-shadow: 0 2px #c9302c;
+        background-color: #FF5252;
+        box-shadow: 0 2px #C9302C;
         transform: translateY(2px);
     }
     </style>
@@ -72,22 +71,22 @@ def draw_fraction_bar(num, den, color="#FF6B6B", label=""):
   total_blocks = total_units * den
   block_w = width / total_blocks
 
-  svg = f'<svg width="100%" height="{height + 30}" viewBox="0 0 {width} {height + 30}" xmlns="http://www.w3.org/2000/svg">'
+  svg = f'<svg width="100%" height="{height + 35}" viewBox="0 0 {width} {height + 35}" xmlns="http://www.w3.org/2000/svg">'
   for i in range(total_blocks):
     x = i * block_w
-    fill = color if i < num else "#FFF0F0"
+    fill = color if i < num else "#EDF2F7"
     stroke_w = 3 if (i % den == 0 and i > 0) else 1
-    stroke_col = "#333333" if (i % den == 0 and i > 0) else "#FFFFFF"
+    stroke_col = "#2D3748" if (i % den == 0 and i > 0) else "#CBD5E0"
     svg += f'<rect x="{x}" y="0" width="{block_w}" height="{height}" fill="{fill}" stroke="{stroke_col}" stroke-width="{stroke_w}" rx="8"/>'
     if block_w > 28:
-      text_col = "white" if i < num else "#777777"
+      text_col = "white" if i < num else "#2D3748"
       svg += f'<text x="{x + block_w/2}" y="{height/2 + 6}" font-family="sans-serif" font-size="14" font-weight="bold" fill="{text_col}" text-anchor="middle">1/{den}</text>'
 
   for w in range(total_units):
-    svg += f'<rect x="{w * (width/total_units)}" y="0" width="{width/total_units}" height="{height}" fill="none" stroke="#2D3748" stroke-width="3" rx="8"/>'
+    svg += f'<rect x="{w * (width/total_units)}" y="0" width="{width/total_units}" height="{height}" fill="none" stroke="#1A365D" stroke-width="3" rx="8"/>'
 
   if label:
-    svg += f'<text x="5" y="{height + 22}" font-family="sans-serif" font-size="15" font-weight="bold" fill="#2D3748">{label}</text>'
+    svg += f'<text x="5" y="{height + 25}" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1A365D">{label}</text>'
   svg += "</svg>"
   return svg
 
@@ -97,8 +96,8 @@ def draw_fraction_circle(num, den, color="#4ECDC4"):
   cx, cy, r = size / 2, size / 2, (size / 2) - 10
   svg = f'<svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">'
   if den == 1:
-    fill = color if num >= 1 else "#FFF0F0"
-    svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="#2D3748" stroke-width="3"/>'
+    fill = color if num >= 1 else "#EDF2F7"
+    svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="#1A365D" stroke-width="3"/>'
   else:
     for i in range(den):
       start_angle = (i * 360 / den) - 90
@@ -108,9 +107,9 @@ def draw_fraction_circle(num, den, color="#4ECDC4"):
       x2 = cx + r * math.cos(math.radians(end_angle))
       y2 = cy + r * math.sin(math.radians(end_angle))
       large_arc = 1 if (360 / den) > 180 else 0
-      fill = color if i < num else "#FFF0F0"
+      fill = color if i < num else "#EDF2F7"
       path = f"M {cx} {cy} L {x1} {y1} A {r} {r} 0 {large_arc} 1 {x2} {y2} Z"
-      svg += f'<path d="{path}" fill="{fill}" stroke="#2D3748" stroke-width="2"/>'
+      svg += f'<path d="{path}" fill="{fill}" stroke="#1A365D" stroke-width="2"/>'
   svg += "</svg>"
   return svg
 
@@ -127,13 +126,13 @@ def draw_area_model(n1, d1, n2, d2):
       is_shaded_h = r < n2
       is_shaded_v = c < n1
       if is_shaded_h and is_shaded_v:
-        fill = "#FF6B6B"  # Super fun overlap color!
+        fill = "#FF6B6B"
       elif is_shaded_v:
         fill = "#4ECDC4"
       elif is_shaded_h:
         fill = "#FFD166"
       else:
-        fill = "#FFF0F0"
+        fill = "#EDF2F7"
       svg += f'<rect x="{x}" y="{y}" width="{cell_w}" height="{cell_h}" fill="{fill}" stroke="#FFFFFF" stroke-width="3" rx="4"/>'
   svg += "</svg>"
   return svg
@@ -177,7 +176,7 @@ def create_pdf_worksheet(num_problems, include_key):
   pdf.set_font("Arial", "B", 16)
   pdf.cell(
       0, 10, "🌟 5th Grade Super Fun Fraction Practice Worksheet 🌟", 0, 1, "C"
-    )
+  )
   pdf.set_font("Arial", "", 11)
   pdf.cell(
       0,
@@ -248,6 +247,9 @@ mode = st.sidebar.radio(
 # ==========================================
 if mode == "1. 🍕 Pizza & Bar Explorer":
   st.markdown("<h1>🍕 Pizza & Fraction Bar Explorer</h1>", unsafe_allow_html=True)
+  st.markdown(
+      "<div class='fun-card'>", unsafe_allow_html=True
+  )  # Wrap in card for high contrast
   st.write(
       "Welcome to the fraction diner! Slide the controls to cut delicious"
       " pizzas and bars into equal slices."
@@ -262,7 +264,7 @@ if mode == "1. 🍕 Pizza & Bar Explorer":
     num = st.slider("Yummy Shaded Slices (Numerator)", 0, den, 3, key="m1_num")
 
     st.metric(
-        label="⭐ Fraction Score / Value",
+        label="⭐ Fraction Value",
         value=f"{num/den:.3f}",
         delta=f"{(num/den)*100:.1f}% filled",
     )
@@ -296,12 +298,14 @@ if mode == "1. 🍕 Pizza & Bar Explorer":
           ),
           unsafe_allow_html=True,
       )
+  st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # MODE 2: COMPARE TWO FRACTIONS
 # ==========================================
 elif mode == "2. ⚖️ Fraction Battle":
   st.markdown("<h1>⚖️ Fraction Battle Arena</h1>", unsafe_allow_html=True)
+  st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write("Line up two fraction treats side-by-side. Which one is bigger?")
 
   c1, c2 = st.columns(2)
@@ -340,11 +344,12 @@ elif mode == "2. ⚖️ Fraction Battle":
     msg = "🤝 It's a tie! Both fractions are completely equal!"
 
   st.markdown(
-      f"<h2 style='text-align: center;'>{num_a}/{den_a} &nbsp; {symbol} &nbsp;"
-      f" {num_b}/{den_b}</h2>",
+      f"<h2 style='text-align: center; color: #1A365D;'>{num_a}/{den_a} &nbsp;"
+      f" {symbol} &nbsp; {num_b}/{den_b}</h2>",
       unsafe_allow_html=True,
   )
   st.success(msg)
+  st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # MODE 3: ADD UNLIKE FRACTIONS
@@ -353,6 +358,7 @@ elif mode == "3. ➕ Super Addition":
   st.markdown(
       "<h1>➕ Super Fraction Addition Combiner</h1>", unsafe_allow_html=True
   )
+  st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
       "Want to add pieces of different sizes? Let's use our magic machine to"
       " find a common denominator first!"
@@ -407,12 +413,14 @@ elif mode == "3. ➕ Super Addition":
       f"🌟 **Super Result:** `{total_num}/{lcm}` (Simplified: "
       f"`{simplified.numerator}/{simplified.denominator}`)"
   )
+  st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # MODE 4: MULTIPLY FRACTIONS (AREA GRID)
 # ==========================================
 elif mode == "4. 🎨 Magic Area Garden":
   st.markdown("<h1>🎨 Magic Area Garden Multiplier</h1>", unsafe_allow_html=True)
+  st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
       "Plant a magic garden! Horizontal rows (Yellow) cross with vertical"
       " columns (Teal). The sparkling **Coral overlapping squares** show your"
@@ -444,17 +452,19 @@ elif mode == "4. 🎨 Magic Area Garden":
     )
     st.markdown(draw_area_model(n1, d1, n2, d2), unsafe_allow_html=True)
     st.markdown(
-        "<p style='color: #4A5568; font-size: 14px; font-weight: bold;'>🟦 Teal:"
+        "<p style='color: #1A365D; font-size: 14px; font-weight: bold;'>🟦 Teal:"
         " Width &nbsp;|&nbsp; 🟨 Yellow: Height &nbsp;|&nbsp; 🟥 Coral: Overlap"
         " Harvest!</p>",
         unsafe_allow_html=True,
     )
+  st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # MODE 5: CHALLENGE & QUIZ MODE
 # ==========================================
 elif mode == "5. 🏆 Challenge Arena":
   st.markdown("<h1>🏆 Fraction Challenge Arena</h1>", unsafe_allow_html=True)
+  st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write("Earn points, collect stellar scores, and become a fraction master!")
 
   col_score1, col_score2 = st.columns(2)
@@ -467,7 +477,9 @@ elif mode == "5. 🏆 Challenge Arena":
     generate_new_question()
 
   st.markdown(
-      f"<div class='fun-card'><h3>{st.session_state.quiz_question}</h3></div>",
+      f"<div style='background-color: #F7FAFC; padding: 15px; border-radius:"
+      f" 10px; border: 2px dashed #CBD5E0; margin-bottom: 15px;'><h3"
+      f" style='color: #1A365D !important;'>{st.session_state.quiz_question}</h3></div>",
       unsafe_allow_html=True,
   )
 
@@ -496,12 +508,14 @@ elif mode == "5. 🏆 Challenge Arena":
     if st.button("➡️ Next Quest!"):
       generate_new_question()
       st.rerun()
+  st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # MODE 6: PDF WORKSHEET GENERATOR
 # ==========================================
 elif mode == "6. 📄 Printable Worksheets":
   st.markdown("<h1>📄 Printable Fraction Worksheet Factory</h1>", unsafe_allow_html=True)
+  st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
       "Teachers and students! Build a customized printable practice packet"
       " complete with a secret answer key!"
@@ -526,3 +540,4 @@ elif mode == "6. 📄 Printable Worksheets":
         file_name="fun_fraction_practice_packet.pdf",
         mime="application/pdf",
     )
+  st.markdown("</div>", unsafe_allow_html=True)
