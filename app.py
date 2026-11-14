@@ -4,7 +4,7 @@ import random
 from fpdf import FPDF
 import streamlit as st
 
-# --- PAGE CONFIGURATION & ROBUST HIGH-CONTRAST CSS ---
+# --- PAGE CONFIGURATION & CHUNKY ARCADE CSS ---
 st.set_page_config(
     page_title="🌟 Fun 5th Grade Fraction Adventure! 🍕", layout="wide"
 )
@@ -37,35 +37,49 @@ st.markdown("""
     /* Standard Markdown Text */
     p, span, label, .stMarkdown {
         color: #1A365D !important;
-        font-size: 16px;
+        font-size: 18px;
     }
     
     /* Custom Card Containers for High Readability */
     .fun-card {
         background-color: #FFFFFF;
-        padding: 25px;
-        border-radius: 20px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
-        border: 3px solid #FFD166;
+        padding: 30px;
+        border-radius: 25px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        border: 4px solid #FFD166;
+    }
+    
+    /* --- BIG CHUNKY ARCADE SLIDERS --- */
+    div[data-baseweb="slider"] div[role="slider"] {
+        background-color: #FF6B6B !important;
+        height: 32px !important;
+        width: 32px !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border: 3px solid #FFFFFF !important;
+    }
+    div[data-baseweb="slider"] div:has(> div[role="slider"]) {
+        background-color: #4ECDC4 !important;
+        height: 12px !important;
+        border-radius: 6px !important;
     }
     
     /* Playful Buttons Styling */
     .stButton>button {
         background-color: #FF6B6B;
         color: white !important;
-        font-size: 18px;
+        font-size: 20px;
         font-weight: bold;
-        border-radius: 15px;
-        padding: 10px 24px;
+        border-radius: 18px;
+        padding: 12px 28px;
         border: none;
-        box-shadow: 0 4px #D9534F;
+        box-shadow: 0 5px #D9534F;
         transition: all 0.2s ease;
     }
     .stButton>button:hover {
         background-color: #FF5252;
         box-shadow: 0 2px #C9302C;
-        transform: translateY(2px);
+        transform: translateY(3px);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -83,7 +97,7 @@ if "quiz_question" not in st.session_state:
 # --- HELPER FUNCTIONS FOR SVG MANIPULATIVES ---
 def draw_fraction_bar(num, den, color="#FF6B6B", label=""):
   width = 500
-  height = 60
+  height = 65
   total_units = max(1, math.ceil(num / den))
   total_blocks = total_units * den
   block_w = width / total_blocks
@@ -94,27 +108,27 @@ def draw_fraction_bar(num, den, color="#FF6B6B", label=""):
     fill = color if i < num else "#EDF2F7"
     stroke_w = 3 if (i % den == 0 and i > 0) else 1
     stroke_col = "#2D3748" if (i % den == 0 and i > 0) else "#CBD5E0"
-    svg += f'<rect x="{x}" y="0" width="{block_w}" height="{height}" fill="{fill}" stroke="{stroke_col}" stroke-width="{stroke_w}" rx="8"/>'
+    svg += f'<rect x="{x}" y="0" width="{block_w}" height="{height}" fill="{fill}" stroke="{stroke_col}" stroke-width="{stroke_w}" rx="10"/>'
     if block_w > 28:
-      text_col = "white" if i < num else "#2D3748"
-      svg += f'<text x="{x + block_w/2}" y="{height/2 + 6}" font-family="sans-serif" font-size="14" font-weight="bold" fill="{text_col}" text-anchor="middle">1/{den}</text>'
+      text_col = "white" if i < num else "#1A365D"
+      svg += f'<text x="{x + block_w/2}" y="{height/2 + 7}" font-family="sans-serif" font-size="16" font-weight="bold" fill="{text_col}" text-anchor="middle">1/{den}</text>'
 
   for w in range(total_units):
-    svg += f'<rect x="{w * (width/total_units)}" y="0" width="{width/total_units}" height="{height}" fill="none" stroke="#1A365D" stroke-width="3" rx="8"/>'
+    svg += f'<rect x="{w * (width/total_units)}" y="0" width="{width/total_units}" height="{height}" fill="none" stroke="#1A365D" stroke-width="4" rx="10"/>'
 
   if label:
-    svg += f'<text x="5" y="{height + 25}" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1A365D">{label}</text>'
+    svg += f'<text x="5" y="{height + 28}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1A365D">{label}</text>'
   svg += "</svg>"
   return svg
 
 
 def draw_fraction_circle(num, den, color="#4ECDC4"):
-  size = 180
+  size = 200
   cx, cy, r = size / 2, size / 2, (size / 2) - 10
   svg = f'<svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">'
   if den == 1:
     fill = color if num >= 1 else "#EDF2F7"
-    svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="#1A365D" stroke-width="3"/>'
+    svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="#1A365D" stroke-width="4"/>'
   else:
     for i in range(den):
       start_angle = (i * 360 / den) - 90
@@ -126,13 +140,13 @@ def draw_fraction_circle(num, den, color="#4ECDC4"):
       large_arc = 1 if (360 / den) > 180 else 0
       fill = color if i < num else "#EDF2F7"
       path = f"M {cx} {cy} L {x1} {y1} A {r} {r} 0 {large_arc} 1 {x2} {y2} Z"
-      svg += f'<path d="{path}" fill="{fill}" stroke="#1A365D" stroke-width="2"/>'
+      svg += f'<path d="{path}" fill="{fill}" stroke="#1A365D" stroke-width="2.5"/>'
   svg += "</svg>"
   return svg
 
 
 def draw_area_model(n1, d1, n2, d2):
-  width, height = 300, 300
+  width, height = 320, 320
   cell_w = width / d1
   cell_h = height / d2
   svg = f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">'
@@ -150,7 +164,7 @@ def draw_area_model(n1, d1, n2, d2):
         fill = "#FFD166"
       else:
         fill = "#EDF2F7"
-      svg += f'<rect x="{x}" y="{y}" width="{cell_w}" height="{cell_h}" fill="{fill}" stroke="#FFFFFF" stroke-width="3" rx="4"/>'
+      svg += f'<rect x="{x}" y="{y}" width="{cell_w}" height="{cell_h}" fill="{fill}" stroke="#FFFFFF" stroke-width="3" rx="6"/>'
   svg += "</svg>"
   return svg
 
@@ -266,13 +280,13 @@ if mode == "1. 🍕 Pizza & Bar Explorer":
   st.markdown("<h1>🍕 Pizza & Fraction Bar Explorer</h1>", unsafe_allow_html=True)
   st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
-      "Welcome to the fraction diner! Slide the controls to cut delicious"
-      " pizzas and bars into equal slices."
+      "Welcome to the fraction diner! Grab the **big chunky sliders** below"
+      " to cut delicious pizzas and bars into equal slices!"
   )
 
   col1, col2 = st.columns([1, 2])
   with col1:
-    st.markdown("### 🎛️ Slicer Controls")
+    st.markdown("### 🎛️ Big Slicer Controls")
     den = st.slider(
         "Slices in 1 Whole (Denominator)", 1, 12, 4, key="m1_den"
     )
@@ -321,7 +335,10 @@ if mode == "1. 🍕 Pizza & Bar Explorer":
 elif mode == "2. ⚖️ Fraction Battle":
   st.markdown("<h1>⚖️ Fraction Battle Arena</h1>", unsafe_allow_html=True)
   st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
-  st.write("Line up two fraction treats side-by-side. Which one is bigger?")
+  st.write(
+      "Use the big sliders to set two fraction treats side-by-side. Which one"
+      " is bigger?"
+  )
 
   c1, c2 = st.columns(2)
   with c1:
@@ -375,8 +392,8 @@ elif mode == "3. ➕ Super Addition":
   )
   st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
-      "Want to add pieces of different sizes? Let's use our magic machine to"
-      " find a common denominator first!"
+      "Slide the controls to add pieces of different sizes using our magic"
+      " common denominator machine!"
   )
 
   col1, col2 = st.columns(2)
@@ -437,9 +454,8 @@ elif mode == "4. 🎨 Magic Area Garden":
   st.markdown("<h1>🎨 Magic Area Garden Multiplier</h1>", unsafe_allow_html=True)
   st.markdown("<div class='fun-card'>", unsafe_allow_html=True)
   st.write(
-      "Plant a magic garden! Horizontal rows (Yellow) cross with vertical"
-      " columns (Teal). The sparkling **Coral overlapping squares** show your"
-      " final harvest crop!"
+      "Use the big chunky sliders to plant your garden width and height!"
+      " The sparkling **Coral overlapping squares** show your harvest crop."
   )
 
   col1, col2 = st.columns([1, 2])
@@ -467,7 +483,7 @@ elif mode == "4. 🎨 Magic Area Garden":
     )
     st.markdown(draw_area_model(n1, d1, n2, d2), unsafe_allow_html=True)
     st.markdown(
-        "<p style='color: #1A365D; font-size: 14px; font-weight: bold;'>🟦 Teal:"
+        "<p style='color: #1A365D; font-size: 16px; font-weight: bold;'>🟦 Teal:"
         " Width &nbsp;|&nbsp; 🟨 Yellow: Height &nbsp;|&nbsp; 🟥 Coral: Overlap"
         " Harvest!</p>",
         unsafe_allow_html=True,
@@ -492,8 +508,8 @@ elif mode == "5. 🏆 Challenge Arena":
     generate_new_question()
 
   st.markdown(
-      f"<div style='background-color: #F7FAFC; padding: 15px; border-radius:"
-      f" 10px; border: 2px dashed #CBD5E0; margin-bottom: 15px;'><h3"
+      f"<div style='background-color: #F7FAFC; padding: 20px; border-radius:"
+      f" 15px; border: 2px dashed #CBD5E0; margin-bottom: 20px;'><h3"
       f" style='color: #1A365D !important;'>{st.session_state.quiz_question}</h3></div>",
       unsafe_allow_html=True,
   )
