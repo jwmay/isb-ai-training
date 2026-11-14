@@ -1,5 +1,4 @@
 from fractions import Fraction
-import io
 import math
 import random
 from fpdf import FPDF
@@ -176,7 +175,7 @@ def create_pdf_worksheet(num_problems, include_key):
     for ans in answers:
       pdf.cell(0, 10, ans, 0, 1)
 
-  return pdf.output(dest="S").encode("latin1")
+  return bytes(pdf.output())
 
 
 # --- APP NAVIGATION ---
@@ -193,29 +192,79 @@ mode = st.sidebar.radio(
     ],
 )
 
-# [MODES 1 through 5 omitted here for brevity, keeping existing code logic...]
+# ==========================================
+# MODE 1: EXPLORE & EQUIVALENCE
+# ==========================================
 if mode == "1. Explore & Equivalent Fractions":
   st.header("🔍 Explore a Fraction & Find Equivalents")
-  den = st.slider(
-      "Denominator (Total equal parts in 1 whole)", 1, 12, 4, key="m1_den"
-  )
-  num = st.slider("Numerator (Shaded parts)", 0, den, 3, key="m1_num")
-  st.markdown(
-      draw_fraction_bar(num, den, "#4F8BF9", f"{num} out of {den} equal parts"),
-      unsafe_allow_html=True,
+  st.write(
+      "Adjust the numerator and denominator to see how the pieces change size."
   )
 
+  col1, col2 = st.columns([1, 2])
+  with col1:
+    den = st.slider(
+        "Denominator (Total equal parts in 1 whole)", 1, 12, 4, key="m1_den"
+    )
+    num = st.slider("Numerator (Shaded parts)", 0, den, 3, key="m1_num")
+
+    st.metric(
+        label="Decimal & Percentage Value",
+        value=f"{num/den:.3f}",
+        delta=f"{(num/den)*100:.1f}%",
+    )
+
+  with col2:
+    st.subheader(f"Visualizing {num}/{den}")
+    st.markdown(
+        draw_fraction_bar(
+            num, den, "#4F8BF9", f"{num} out of {den} equal parts"
+        ),
+        unsafe_allow_html=True,
+    )
+
+    c_circle, c_eq = st.columns([1, 1.5])
+    with c_circle:
+      st.markdown(
+          draw_fraction_circle(num, den, "#4F8BF9"), unsafe_allow_html=True
+      )
+    with c_eq:
+      st.write("**Equivalent Fractions (Same Amount, Different Cut Sizes):**")
+      multiplier = st.slider(
+          "Split each piece into how many smaller pieces?", 1, 4, 2, key="m1_mult"
+      )
+      eq_num, eq_den = num * multiplier, den * multiplier
+      st.markdown(
+          draw_fraction_bar(
+              eq_num,
+              eq_den,
+              "#2EC4B6",
+              f"{num}/{den} = {eq_num}/{eq_den}",
+          ),
+          unsafe_allow_html=True,
+      )
+
+# ==========================================
+# MODE 2: COMPARE TWO FRACTIONS
+# ==========================================
 elif mode == "2. Compare Two Fractions":
   st.header("⚖️ Compare Two Fractions")
+  st.write(
+      "Line up two fraction bars to see which one takes up more space."
+  )
+
   c1, c2 = st.columns(2)
   with c1:
+    st.subheader("Fraction A (Blue)")
     den_a = st.slider("Denominator A", 1, 12, 3, key="da")
     num_a = st.slider("Numerator A", 0, den_a, 2, key="na")
     st.markdown(
         draw_fraction_bar(num_a, den_a, "#4F8BF9", f"Fraction A: {num_a}/{den_a}"),
         unsafe_allow_html=True,
     )
+
   with c2:
+    st.subheader("Fraction B (Coral)")
     den_b = st.slider("Denominator B", 1, 12, 5, key="db")
     num_b = st.slider("Numerator B", 0, den_b, 3, key="nb")
     st.markdown(
@@ -223,43 +272,171 @@ elif mode == "2. Compare Two Fractions":
         unsafe_allow_html=True,
     )
 
+  st.divider()
+  val_a = Fraction(num_a, den_a)
+  val_b = Fraction(num_b, den_b)
+
+  if val_a > val_b:
+    symbol = ">"
+    msg = f"**{num_a}/{den_a}** is greater than **{num_b}/{den_b}**"
+  elif val_a < val_b:
+    symbol = "<"
+    msg = f"**{num_a}/{den_a}** is less than **{num_b}/{den_b}**"
+  else:
+    symbol = "="
+    msg = f"**{num_a}/{den_a}** is equal to **{num_b}/{den_b}**!"
+
+  st.markdown(
+      f"<h2 style='text-align: center;'>{num_a}/{den_a} &nbsp; {symbol} &nbsp;"
+      f" {num_b}/{den_b}</h2>",
+      unsafe_allow_html=True,
+  )
+  st.info(f"💡 **Why?** {msg}")
+
+# ==========================================
+# MODE 3: ADD UNLIKE FRACTIONS
+# ==========================================
 elif mode == "3. Add Fractions (Unlike Denominators)":
   st.header("➕ Adding Fractions with Unlike Denominators")
-  d1 = st.selectbox("First Denominator", [2, 3, 4, 5, 6, 8, 10], index=0)
-  n1 = st.slider("First Numerator", 1, d1, 1, key="add_n1")
-  d2 = st.selectbox("Second Denominator", [2, 3, 4, 5, 6, 8, 10], index=1)
-  n2 = st.slider("Second Numerator", 1, d2, 1, key="add_n2")
+  st.write(
+      "To add fractions with different piece sizes, convert them into"
+      " **same-sized pieces** (common denominator)."
+  )
+
+  col1, col2 = st.columns(2)
+  with col1:
+    d1 = st.selectbox("First Denominator", [2, 3, 4, 5, 6, 8, 10], index=0)
+    n1 = st.slider("First Numerator", 1, d1, 1, key="add_n1")
+  with col2:
+    d2 = st.selectbox("Second Denominator", [2, 3, 4, 5, 6, 8, 10], index=1)
+    n2 = st.slider("Second Numerator", 1, d2, 1, key="add_n2")
+
+  st.subheader("Step 1: Original Pieces")
+  st.markdown(
+      draw_fraction_bar(n1, d1, "#4F8BF9", f"{n1}/{d1}"), unsafe_allow_html=True
+  )
+  st.markdown(
+      draw_fraction_bar(n2, d2, "#FF6B6B", f"{n2}/{d2}"), unsafe_allow_html=True
+  )
+
+  st.subheader("Step 2: Common Denominator Grid")
   lcm = math.lcm(d1, d2)
-  total_num = (n1 * (lcm // d1)) + (n2 * (lcm // d2))
+  eq_n1 = n1 * (lcm // d1)
+  eq_n2 = n2 * (lcm // d2)
+  total_num = eq_n1 + eq_n2
+
+  st.write(f"Common denominator is **{lcm}**:")
+  st.markdown(
+      draw_fraction_bar(eq_n1, lcm, "#4F8BF9", f"{eq_n1}/{lcm}"),
+      unsafe_allow_html=True,
+  )
+  st.markdown(
+      draw_fraction_bar(eq_n2, lcm, "#FF6B6B", f"{eq_n2}/{lcm}"),
+      unsafe_allow_html=True,
+  )
+
+  st.subheader("Step 3: Combined Sum")
   st.markdown(
       draw_fraction_bar(
           total_num, lcm, "#9B5DE5", f"Total = {total_num}/{lcm}"
       ),
       unsafe_allow_html=True,
   )
+  simplified = Fraction(total_num, lcm)
+  st.success(
+      f"**Result:** `{total_num}/{lcm}` (Simplified:"
+      f" `{simplified.numerator}/{simplified.denominator}`)"
+  )
 
+# ==========================================
+# MODE 4: MULTIPLY FRACTIONS (AREA GRID)
+# ==========================================
 elif mode == "4. Multiply Fractions (Area Grid Model)":
   st.header("✖️ Multiplying Fractions with an Area Grid")
-  d1, n1 = 4, 3
-  d2, n2 = 3, 2
-  st.markdown(draw_area_model(n1, d1, n2, d2), unsafe_allow_html=True)
+  st.write(
+      "When multiplying fractions, imagine a garden where one fraction is"
+      " shaded horizontally (Blue) and the other vertically (Coral). The"
+      " **purple overlapping squares** show the product!"
+  )
 
+  col1, col2 = st.columns([1, 2])
+  with col1:
+    d1 = st.slider("Width Denominator", 2, 6, 4, key="m_d1")
+    n1 = st.slider("Width Numerator", 1, d1, 3, key="m_n1")
+    d2 = st.slider("Height Denominator", 2, 6, 3, key="m_d2")
+    n2 = st.slider("Height Numerator", 1, d2, 2, key="m_n2")
+
+    num_product = n1 * n2
+    den_product = d1 * d2
+    prod_fraction = Fraction(num_product, den_product)
+
+    st.metric(
+        label="Multiplication Result",
+        value=f"{num_product}/{den_product}",
+        delta=(
+            f"Simplified: {prod_fraction.numerator}/{prod_fraction.denominator}"
+        ),
+    )
+
+  with col2:
+    st.subheader(
+        f"Area Grid: {n1}/{d1} × {n2}/{d2} = {num_product}/{den_product}"
+    )
+    st.markdown(draw_area_model(n1, d1, n2, d2), unsafe_allow_html=True)
+    st.markdown(
+        "<p style='color: #666; font-size: 14px;'>🟦 Blue: Width fraction &nbsp;|&nbsp;"
+        " 🟥 Coral: Height fraction &nbsp;|&nbsp; 🟪 Purple: Overlapping"
+        " product</p>",
+        unsafe_allow_html=True,
+    )
+
+# ==========================================
+# MODE 5: CHALLENGE & QUIZ MODE
+# ==========================================
 elif mode == "5. 🏆 Challenge & Quiz Mode":
   st.header("🏆 Fraction Challenge Arena")
+  st.write("Test your visual fraction skills! Solve problems to earn points.")
+
+  col_score1, col_score2 = st.columns(2)
+  with col_score1:
+    st.metric("Score", st.session_state.score)
+  with col_score2:
+    st.metric("Questions Answered", st.session_state.questions_answered)
+
   if st.session_state.quiz_question is None:
     generate_new_question()
+
   st.markdown(
       f"### Question:\n{st.session_state.quiz_question}", unsafe_allow_html=True
   )
-  user_ans = st.text_input("Enter your answer:")
-  if st.button("Submit"):
-    if user_ans.strip() == str(st.session_state.quiz_correct).strip():
-      st.success("🎉 Correct!")
-    else:
-      st.error(f"❌ Correct answer was: {st.session_state.quiz_correct}")
-  if st.button("Next"):
-    generate_new_question()
-    st.rerun()
+
+  user_ans = st.text_input(
+      "Enter your answer (e.g. `3/4`, `>`, or `5/12`):", key="user_input_quiz"
+  )
+
+  col_btn1, col_btn2 = st.columns(2)
+  with col_btn1:
+    if st.button("Submit Answer"):
+      st.session_state.questions_answered += 1
+      cleaned_user = user_ans.strip().replace(" ", "")
+      cleaned_correct = str(st.session_state.quiz_correct).strip().replace(
+          " ", ""
+      )
+
+      if cleaned_user == cleaned_correct:
+        st.session_state.score += 1
+        st.success(
+            "🎉 **Correct! Great job!** Click next to tackle another one."
+        )
+      else:
+        st.error(
+            f"❌ Not quite! The correct answer was **{cleaned_correct}**."
+        )
+
+  with col_btn2:
+    if st.button("Next Question ➡️"):
+      generate_new_question()
+      st.rerun()
 
 # ==========================================
 # MODE 6: PDF WORKSHEET GENERATOR
